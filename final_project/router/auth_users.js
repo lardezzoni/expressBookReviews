@@ -62,6 +62,7 @@ regd_users.post("/login", (req,res) => {
       req.session.authorization = {
         accessToken,username
     }
+    req.session.username = username;
     return res.status(200).send("User successfully logged in");
     } else {
       return res.status(208).json({message: "Invalid Login. Check username and password"});
@@ -73,15 +74,38 @@ regd_users.put("/auth/review", (req, res) => {
     let reviewQ = req.query.reviews;
     let isbnQ = req.query.ISBN;
 
-
+// this considers that for every review there is an user
 for(i=1;i<Object.keys(books).length; i++){
     let var3 = books[i].ISBN;
     if(isbnQ === var3){
+        let user2 = req.session.username;
         let book = books[i];
-        book["reviews"] = reviewQ;
-        books[i]=book;
+        let var4 = book.reviews.length;
+        console.log(var4);
+        //iterate through all the reviews
+        if(book.username != null){
+        for(n=0; n<book.reviews.length; n++){
+            
+                //if it is the same user
+                if(book.username[n] == user2){
+                       //if not the same review
+                    if(book.reviews[n] != reviewQ){
+                        book.reviews[n] = reviewQ;
+                
+                        books[i]=book;
+                    }
+                } 
+                //need to create a method to add a string to the last review[]
+        }
+        }   
+        else{
+            book.reviews[0] = reviewQ;
+            book.username[0] = user2;
+            books[i]=book;
+        }
+
         let strB = JSON.stringify(book,null,4);
-        res.send("book with ISBN "+isbnQ+" updated. The book is now "+strB)
+        res.send("book with ISBN "+isbnQ+" updated. the user is "+ user2+" The book is now "+strB)
     } 
   }
    
