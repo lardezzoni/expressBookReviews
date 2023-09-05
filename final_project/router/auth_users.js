@@ -73,39 +73,54 @@ regd_users.post("/login", (req,res) => {
 regd_users.put("/auth/review", (req, res) => {
     let reviewQ = req.query.reviews;
     let isbnQ = req.query.ISBN;
+    if(!req.session.username && !req.session.password){
+        return res.status(200).json({message: "invalid username or password"});
+    }
+    else{
+        // this considers that for every review there is an user
+        for(i=1;i<Object.keys(books).length; i++){
+            let var3 = books[i].ISBN;
+            if(isbnQ === var3){
+                let user2 = req.session.username;
+                let book = books[i];
 
-// this considers that for every review there is an user
-for(i=1;i<Object.keys(books).length; i++){
-    let var3 = books[i].ISBN;
-    if(isbnQ === var3){
-        let user2 = req.session.username;
-        let book = books[i];
-        let var4 = book.reviews.length;
-        console.log(var4);
-        //iterate through all the reviews
-        if(book.username != null){
-        for(n=0; n<book.reviews.length; n++){
-            
-                //if it is the same user
-                if(book.username[n] == user2){
-                       //if not the same review
-                    if(book.reviews[n] != reviewQ){
-                        book.reviews[n] = reviewQ;
-                
-                        books[i]=book;
+                //iterate through all the reviews
+                if(book.userReview != null){
+                  for(n=0; n<book.reviews.length; n++){
+                    
+                        //if it is the same user
+                        if(book.userReview[n] == user2){
+                            //if not the same review
+                            if(book.reviews[n] != reviewQ){
+                     
+                                book.reviews[n] = reviewQ;
+                                book.userReview[n] = user2;
+                                books[i]=book;
+ 
+                            }
+                        } 
+                    else{
+                        //if the loop is in the last review
+                        //append in the last a new review
+                        if((n+1) == book.reviews.length){
+                                book.reviews.push(reviewQ);
+                                book.userReview.push(user2);
+                                books[i]=book;
+                        }
+
                     }
-                } 
-                //need to create a method to add a string to the last review[]
-        }
-        }   
-        else{
-            book.reviews[0] = reviewQ;
-            book.username[0] = user2;
-            books[i]=book;
-        }
+                  }
+                }   
+                else{
+ 
+                    book.reviews = reviewQ;
+                    book.userReview = user2;
+                    books[i]=book;
+                }
 
         let strB = JSON.stringify(book,null,4);
         res.send("book with ISBN "+isbnQ+" updated. the user is "+ user2+" The book is now "+strB)
+    }          
     } 
   }
    
