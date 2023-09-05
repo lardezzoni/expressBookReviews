@@ -116,14 +116,50 @@ public_users.get('/author/:author',function (req, res) {
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    let title2 = req.params.title;
+    //create promise
+    let myPromise1 = new Promise((resolve,reject) => {
+        setTimeout(() => {
+     
+        },2000)
+
+        //the params have to be TitleName so to find need to lowercase
+        title2 = title2.toLowerCase();
+        //loop through all books
+        for(i=1;i<Object.keys(books).length; i++){
+             let var3 = books[i].title;
+             //remove spaces and lowercase to compare
+             var3 = var3.replace(/\s/g, '');
+             var3 = var3.toLowerCase();
+            if(title2 === var3){
+                 resolve(res.send(books[i]));
+            }
+        }
+        reject("title not found");
+
+    }) 
+
 });
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+
+    let ISBN2 = req.params.isbn;
+    let myPromise1 = new Promise((resolve,reject) => {
+        setTimeout(() => {
+     
+        },2000)
+
+        for(i=1;i<Object.keys(books).length; i++){
+             let var3 = books[i].ISBN;
+            if(ISBN2 === var3){
+                 resolve(res.send(books[i].reviews));
+            }
+        }
+        reject("not found");
+
+    })
+
 });
 
 module.exports.general = public_users;
