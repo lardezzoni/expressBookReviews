@@ -119,13 +119,40 @@ regd_users.put("/auth/review", (req, res) => {
                 }
 
         let strB = JSON.stringify(book,null,4);
-        res.send("book with ISBN "+isbnQ+" updated. the user is "+ user2+" The book is now "+strB)
+        res.send("book with ISBN "+isbnQ+" updated. The user that add the review is "+ user2+". The book is now "+strB)
     }          
     } 
   }
    
     
-  return res.status(300).json({message: "Yet to be implemented"});
+  return res.status(300).json({message: "error"});
+});
+regd_users.delete("/auth/review/:isbn", (req,res) => {
+
+    let isbnDelete = req.params.isbn;
+    
+    for(i=1;i<Object.keys(books).length; i++){
+         let var3 = books[i].ISBN;
+         console.log(var3);
+        if(isbnDelete === var3){
+            let book = books[i];
+            for(n = 0; n < book.userReview.length; n++){
+                if(book.userReview[n] == req.session.username){
+                    console.log("here");
+                    book.userReview[n] = {};
+                    console.log("here2");
+                    book.reviews[n] = {};
+                    console.log("here3");
+                    books[i] = book;
+                    res.send("Review deleted. The updated book is "+ JSON.stringify(book,null,4));
+                }
+                
+            }
+        }
+
+    }
+    return res.status(200).json({message: "ISBN or user not found"});
+
 });
 
 module.exports.authenticated = regd_users;
